@@ -231,8 +231,7 @@
 #utilityDialog { width:min(900px,94vw); }
 #utilityGrid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 @media(max-width:620px) { #utilityGrid { grid-template-columns:1fr; } }
-.proxy-tool-highlight h3 a,.proxy-tool-highlight .region { color:#ff6b6b!important; font-weight:700; }
-.proxy-tool-highlight { border-color:#b74949!important; }
+.invite-code { color:#ff6b6b; font-weight:700; }
 </style>
 </head>
 <body>
@@ -397,15 +396,16 @@ function accessChip(access) {
   if (access === '备注待补充') return '<span class="chip">？ 访问状态待确认</span>';
   return '<span class="chip" title="尚未验证你所在网络是否可以直连；如无法打开，可编辑访问提示">🌐 网络待测试</span>';
 }
+function highlightInvite(value) { return escapeHtml(value).replaceAll('YHXWOu2a', '<span class="invite-code">YHXWOu2a</span>'); }
 function cardMarkup(item) {
   const isFav = favorites.has(item.id);
   const isCustom = item.custom === true;
-  return `<article class="card ${item.id === 'desktop-proxy-share' ? 'proxy-tool-highlight' : ''}">
+  return `<article class="card">
     <div class="card-top"><span class="category-label">${escapeHtml(item.category || '其他')}</span><button class="favorite ${isFav?'on':''}" data-fav="${escapeHtml(item.id)}" aria-label="${isFav?'取消收藏':'加入收藏'}" aria-pressed="${isFav}" title="${isFav?'取消收藏':'加入收藏'}">${isFav?'★':'☆'}</button></div>
     <h3><a href="${escapeHtml(destinationUrl(item.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a></h3>
     ${sourceLabel(item)}
-    <div class="region">${escapeHtml(item.region || '未分类')} ${isCustom?' · 我的添加':''}</div>
-    <p class="desc">${escapeHtml(item.desc || '尚无用途备注。')}</p>
+    <div class="region">${highlightInvite(item.region || '未分类')} ${isCustom?' · 我的添加':''}</div>
+    <p class="desc">${highlightInvite(item.desc || '尚无用途备注。')}</p>
     <div class="card-foot"><div class="chips">${accessChip(item.access || '正常')}${(item.tags||[]).slice(0,2).map(tag=>`<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div><div class="visit-actions"><a class="visit translate-link" href="${escapeHtml(translationUrl(item.url))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(item.name)}：翻译为简体中文" title="Google 网页翻译，可能需要代理">🌐 中文翻译</a><a class="visit" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${item.id === 'steam-official' ? '官网下载 ↗' : '原站 ↗'}</a></div></div>
     ${isCustom?`<div class="manage"><button data-edit="${escapeHtml(item.id)}">编辑</button><button data-delete="${escapeHtml(item.id)}">删除</button></div>`:''}
   </article>`;

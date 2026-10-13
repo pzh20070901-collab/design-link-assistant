@@ -206,6 +206,12 @@
   @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } }
 .proxy-required { background:#543014!important; color:#ffd39a!important; border:1px solid #bb793d; font-weight:700; }
 .header-actions { display:flex; align-items:center; gap:14px; }
+.visit-actions { display:flex; gap:10px; flex-wrap:wrap; flex-shrink:0; }
+.translate-link { color:#ffd39a!important; }
+.translation-note { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; margin-top:24px; font-size:13px; }
+.translation-note p { margin:8px 0 0; color:var(--muted); line-height:1.7; }
+#translateToggle[aria-pressed="true"] { background:#543014; color:#ffd39a; }
+@media(max-width:620px) { .card-foot { flex-direction:column; align-items:flex-start; } }
 </style>
 </head>
 <body>
@@ -243,7 +249,7 @@
       <button class="filter" data-category="字体排版">字体 / 排版</button>
       <button class="filter" data-category="其他">其他</button><button class="filter" data-category="我的收藏">★ 我的收藏</button>
     </div>
-    <div class="tool-actions">
+    <div class="tool-actions"><button type="button" class="action-btn" id="translateToggle" aria-pressed="true" title="通过 Google 翻译打开简体中文版本">🌐 中文翻译：开</button>
       <button class="icon-btn" id="exportBtn" title="导出备份" aria-label="导出备份">⇩</button>
       <button class="action-btn" id="importBtn" title="导入以前导出的备份">导入</button>
       <button class="action-btn primary" id="addBtn">＋ 添加网站</button>
@@ -255,6 +261,7 @@
     <div class="grid" id="linkGrid"></div>
     <div class="empty" id="emptyState">没有找到匹配的网站。换个关键词，或添加一个新网站吧。</div>
 
+    <aside class="translation-note"><strong>🌐 每个网站均可翻译为简体中文</strong><p>默认开启中文翻译：点击网站名称或搜索建议，通过 Google 翻译打开中文版本。每张卡片都提供“中文翻译”和“原站”入口。🪜 Google 翻译可能需要代理；部分地区、网站、登录页及动态内容不支持，图片中的文字可能无法翻译。无法打开时，请使用原站并尝试浏览器自带翻译。翻译链接会将目标网址发送给 Google。</p></aside>
     <aside class="tips">
       <div class="tips-icon">✳</div>
       <div><h3>多语言搜索小技巧</h3><p>在 Pinterest 等灵感平台搜索时，可以把同一个主题换成不同语言尝试，例如品牌设计：<code>Brand Design</code>、<code>ブランドデザイン</code>、<code>브랜드 디자인</code>。不同语言的结果可能带来不同的视觉参考。访问批注：🪜 表示原有备注注明需要代理 / VPN；◷ 表示加载较慢；🌐 表示网络待测试；？ 表示访问状态待确认。是否能直连取决于地区与运营商，待测试不代表需要代理。</p></div>
@@ -327,6 +334,10 @@ let customLinks = normalizeLinks(readStorage(STORAGE_LINKS, []));
 let favorites = new Set(readArray(STORAGE_FAVS).filter(id => allLinks().some(item => item.id === id)));
 let editingId = null;
 let activeSuggestion = -1;
+let translationEnabled = readStorage('linkshelf_translate_v1', true) !== false;
+function translationUrl(url) { const target = new URL('https://translate.google.com/translate'); target.search = new URLSearchParams({sl:'auto',tl:'zh-CN',u:url}).toString(); return target.href; }
+function destinationUrl(url) { return translationEnabled ? translationUrl(url) : url; }
+function updateTranslationToggle() { const button=document.getElementById('translateToggle');button.textContent='🌐 中文翻译：'+(translationEnabled?'开':'关');button.setAttribute('aria-pressed',String(translationEnabled)); }
 let currentCategory = '全部';
 let toastTimer;
 function safeParse(value, fallback) { try { const parsed = JSON.parse(value); return parsed ?? fallback; } catch { return fallback; } }
@@ -360,14 +371,15 @@ function cardMarkup(item) {
   const isCustom = item.custom === true;
   return `<article class="card">
     <div class="card-top"><span class="category-label">${escapeHtml(item.category || '其他')}</span><button class="favorite ${isFav?'on':''}" data-fav="${escapeHtml(item.id)}" aria-label="${isFav?'取消收藏':'加入收藏'}" aria-pressed="${isFav}" title="${isFav?'取消收藏':'加入收藏'}">${isFav?'★':'☆'}</button></div>
-    <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a></h3>
+    <h3><a href="${escapeHtml(destinationUrl(item.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a></h3>
     <div class="region">${escapeHtml(item.region || '未分类')} ${isCustom?' · 我的添加':''}</div>
     <p class="desc">${escapeHtml(item.desc || '尚无用途备注。')}</p>
-    <div class="card-foot"><div class="chips">${accessChip(item.access || '正常')}${(item.tags||[]).slice(0,2).map(tag=>`<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div><a class="visit" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">打开网站 <span>↗</span></a></div>
+    <div class="card-foot"><div class="chips">${accessChip(item.access || '正常')}${(item.tags||[]).slice(0,2).map(tag=>`<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div><div class="visit-actions"><a class="visit translate-link" href="${escapeHtml(translationUrl(item.url))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(item.name)}：翻译为简体中文" title="Google 网页翻译，可能需要代理">🌐 中文翻译</a><a class="visit" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">原站 ↗</a></div></div>
     ${isCustom?`<div class="manage"><button data-edit="${escapeHtml(item.id)}">编辑</button><button data-delete="${escapeHtml(item.id)}">删除</button></div>`:''}
   </article>`;
 }
 function render() {
+  updateTranslationToggle();
   const query = document.getElementById('searchInput').value.trim().toLocaleLowerCase();
   const all = allLinks();
   let items = all.filter(item => {
@@ -381,7 +393,7 @@ function render() {
   document.getElementById('categoryCount').textContent=new Set(all.map(x=>x.category)).size;
   document.getElementById('linkGrid').innerHTML = items.map(cardMarkup).join('');
   document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
-  document.getElementById('resultCount').textContent = `显示 ${items.length} 个网站 · 点击网站名称或“打开网站”直达`;
+  document.getElementById('resultCount').textContent = `显示 ${items.length} 个网站 · ${translationEnabled ? '点击名称打开中文翻译版 · 可用“原站”直接访问' : '点击名称直接访问 · 可用“中文翻译”查看中文版本'}`;
   document.getElementById('listTitle').textContent = currentCategory === '全部' ? '精选设计网站' : currentCategory === '我的收藏' ? '我的收藏' : currentCategory;
   document.getElementById('totalCount').textContent = all.length;
   document.getElementById('favoriteCount').textContent = favorites.size;
@@ -405,7 +417,7 @@ function renderSuggestions() {
   if (!q) { searchSuggestions.classList.remove('show'); searchInput.setAttribute('aria-expanded','false'); searchSuggestions.innerHTML=''; return; }
   activeSuggestion=-1;
   const matches = allLinks().filter(item => (currentCategory==='全部'||(currentCategory==='我的收藏'?favorites.has(item.id):item.category===currentCategory)) && [item.name,item.url,item.category,item.region,item.desc,...(item.tags||[])].join(' ').toLocaleLowerCase().split(' ').join(' ').includes(q)).slice(0,8);
-  searchSuggestions.innerHTML = matches.length ? matches.map(item => `<button type="button" class="suggestion" role="option" data-open-url="${escapeHtml(item.url)}"><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.region || item.url)} · ${escapeHtml(item.url)}</small></span><span class="arrow">↗</span></button>`).join('') : '<div style="padding:14px;color:#aaaab2;font-size:13px">没有匹配的网站，试试“字体”“日本”“品牌”或“韩国”。</div>';
+  searchSuggestions.innerHTML = matches.length ? matches.map(item => `<button type="button" class="suggestion" role="option" data-open-url="${escapeHtml(destinationUrl(item.url))}"><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.region || item.url)} · ${escapeHtml(item.url)}</small></span><span class="arrow">↗</span></button>`).join('') : '<div style="padding:14px;color:#aaaab2;font-size:13px">没有匹配的网站，试试“字体”“日本”“品牌”或“韩国”。</div>';
   searchSuggestions.classList.add('show'); searchInput.setAttribute('aria-expanded','true');
 }
 searchInput.addEventListener('input', () => { render(); renderSuggestions(); });
@@ -459,6 +471,7 @@ document.getElementById('importFile').addEventListener('change', async event => 
   finally { event.target.value=''; }
 });
 function showToast(message) { const el=document.getElementById('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); }
+document.getElementById('translateToggle').addEventListener('click',()=>{translationEnabled=!translationEnabled;try{localStorage.setItem('linkshelf_translate_v1',JSON.stringify(translationEnabled));}catch{showToast('翻译设置无法保存，当前页面仍可使用');}render();if(searchInput.value.trim())renderSuggestions();showToast(translationEnabled?'已开启：网站名称将打开简体中文翻译版':'已关闭：网站名称将直接打开原站');});
 document.getElementById('sortSelect').addEventListener('change',render);
 document.getElementById('linkGrid').addEventListener('click',event=>{
   const edit=event.target.closest('[data-edit]'), remove=event.target.closest('[data-delete]');

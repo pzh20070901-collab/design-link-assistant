@@ -330,7 +330,7 @@ function allLinks() { return [...starterLinks, ...customLinks]; }
 function saveState() { try { localStorage.setItem(STORAGE_LINKS, JSON.stringify(customLinks)); localStorage.setItem(STORAGE_FAVS, JSON.stringify([...favorites])); return true; } catch { showToast('浏览器无法保存，请导出备份避免丢失'); return false; } }
 function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 function accessChip(access) {
-  if (access === '需要代理') return '<span class="chip warn">↗ 需要代理 / VPN</span>';
+  if (access === '需要代理') return '<span class="chip warn">🪜 需要代理 / VPN</span>';
   if (access === '加载较慢') return '<span class="chip warn">◷ 加载较慢</span>';
   if (access === '备注待补充') return '<span class="chip">？ 待确认</span>';
   return '<span class="chip good">✓ 暂无特别备注</span>';

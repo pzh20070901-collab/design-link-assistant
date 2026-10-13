@@ -219,7 +219,7 @@
     <div class="eyebrow">YOUR DESIGN BOOKMARKS</div>
     <h1>搜索设计灵感</h1>
     <div class="hero-bottom">
-      <p class="intro">作品集、品牌设计、字体与视觉灵感，一搜即达。</p>
+      <p class="intro">产品、环境、视觉传达与交互设计，按专业寻找案例与灵感。</p>
       <div class="stats"><div class="stat"><strong id="totalCount">18</strong><small>Curated links</small></div><div class="stat"><strong id="favoriteCount">0</strong><small>Favorites</small></div><div class="stat"><strong id="categoryCount">6</strong><small>Categories</small></div></div>
     </div>
   </section>
@@ -227,11 +227,15 @@
   <section class="toolbar" aria-label="网站筛选工具">
     <label class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
-      <input id="searchInput" type="search" placeholder="输入关键词，例如：日本、字体、品牌、Pinterest" autocomplete="off" aria-label="搜索网站关键词" aria-controls="searchSuggestions" aria-expanded="false">
+      <input id="searchInput" type="search" placeholder="搜索产品、景观、海报、导视、字体或网站名称" autocomplete="off" aria-label="搜索网站关键词" aria-controls="searchSuggestions" aria-expanded="false">
       <div class="search-suggestions" id="searchSuggestions" role="listbox" aria-label="匹配的网站"></div>
     </label>
     <div class="filter-row" id="filters">
       <button class="filter active" data-category="全部">全部网站</button>
+      <button class="filter" data-category="产品设计">产品设计</button>
+      <button class="filter" data-category="环境设计">环境设计</button>
+      <button class="filter" data-category="视觉传达">视觉传达</button>
+      <button class="filter" data-category="交互设计">交互设计</button>
       <button class="filter" data-category="作品集">作品集 / 工作室</button>
       <button class="filter" data-category="品牌设计">品牌设计</button>
       <button class="filter" data-category="出版资讯">出版 / 资讯</button>
@@ -265,7 +269,7 @@
     <div class="field"><label for="siteName">网站名称 *</label><input id="siteName" required maxlength="80" placeholder="例如：Studio Example"></div>
     <div class="field"><label for="siteUrl">网站链接 *</label><input id="siteUrl" required type="url" placeholder="https://example.com"></div>
     <div class="form-grid">
-      <div class="field"><label for="siteCategory">分类</label><select id="siteCategory"><option>作品集</option><option>品牌设计</option><option>出版资讯</option><option>灵感图库</option><option>字体排版</option><option>其他</option></select></div>
+      <div class="field"><label for="siteCategory">分类</label><select id="siteCategory"><option>产品设计</option><option>环境设计</option><option>视觉传达</option><option>交互设计</option><option>作品集</option><option>品牌设计</option><option>出版资讯</option><option>灵感图库</option><option>字体排版</option><option>其他</option></select></div>
       <div class="field"><label for="siteRegion">地区 / 类型</label><input id="siteRegion" maxlength="60" placeholder="例如：韩国 · 作品集"></div>
     </div>
     <div class="field"><label for="siteDesc">用途备注</label><input id="siteDesc" maxlength="220" placeholder="这个网站适合用来参考什么？"></div>
@@ -281,6 +285,19 @@
 
 <script>
 const starterLinks = [
+  {"id":"core77","name":"Core77","url":"https://www.core77.com/","category":"产品设计","region":"国际 · 工业设计资讯","desc":"工业设计资讯与设计师社区，适合研究产品案例、设计过程及行业话题。","access":"正常","tags":["工业设计","产品设计","设计过程"]},
+  {"id":"yanko-design","name":"Yanko Design","url":"https://www.yankodesign.com/","category":"产品设计","region":"国际 · 产品概念与资讯","desc":"覆盖消费电子、家具和生活用品等产品设计，适合参考造型、功能与概念表达；概念作品不等同于量产方案。","access":"正常","tags":["产品设计","造型","家具","消费电子"]},
+  {"id":"red-dot","name":"Red Dot 红点设计奖","url":"https://www.red-dot.org/","category":"产品设计","region":"国际 · 设计奖与获奖案例","desc":"官方获奖作品与设计奖分类，包含产品、品牌传播和概念设计，适合观察项目呈现与优秀案例。","access":"正常","tags":["产品设计","工业设计","设计奖","品牌"]},
+  {"id":"archdaily","name":"ArchDaily 中文版","url":"https://www.archdaily.com/zh","category":"环境设计","region":"中文 · 建筑与空间案例","desc":"建筑与室内项目资料，适合参考空间组织、项目图纸、材料及设计说明；部分内容为订阅者专属。","access":"正常","tags":["环境设计","建筑","室内","空间","图纸"]},
+  {"id":"gooood","name":"谷德设计网 gooood","url":"https://www.gooood.cn/","category":"环境设计","region":"中文 · 建筑、景观与室内","desc":"建筑、景观和室内案例与访谈，适合研究空间概念、材料细部及项目表达；部分功能需要登录或会员。","access":"正常","tags":["环境设计","景观","室内","建筑","材料"]},
+  {"id":"landezine","name":"Landezine","url":"https://landezine.com/","category":"环境设计","region":"国际 · 景观建筑平台","desc":"景观建筑项目平台，适合参考公共空间、场地设计与景观项目的图文呈现。","access":"正常","tags":["环境设计","景观","公共空间","场地"]},
+  {"id":"segd","name":"SEGD","url":"https://segd.org/","category":"环境设计","region":"国际 · 体验与环境图形设计","desc":"体验设计专业组织，关注导视、展览及空间中的视觉沟通，适合环境设计与视觉传达交叉研究；活动与会员可能收费。","access":"正常","tags":["环境设计","视觉传达","导视","展览","体验设计"]},
+  {"id":"pentagram","name":"Pentagram","url":"https://www.pentagram.com/","category":"视觉传达","region":"国际 · 综合设计机构","desc":"品牌识别、字体、包装、出版及环境图形项目，适合参考完整视觉系统和跨媒介应用。","access":"正常","tags":["视觉传达","品牌","字体","包装","视觉系统"]},
+  {"id":"brand-new","name":"Brand New","url":"https://www.underconsideration.com/brandnew/","category":"视觉传达","region":"国际 · 品牌视觉评论","desc":"品牌标志与识别更新案例及评论，适合比较改版前后与视觉应用；完整内容可能需要付费订阅。","access":"正常","tags":["视觉传达","品牌","标志","视觉识别"]},
+  {"id":"zcool","name":"站酷 ZCOOL","url":"https://www.zcool.com.cn/","category":"视觉传达","region":"中文 · 设计师作品社区","desc":"设计师作品与交流平台，适合浏览视觉作品、项目呈现和创作方向；部分互动与服务需要登录。","access":"正常","tags":["视觉传达","作品集","平面设计","创意"]},
+  {"id":"nngroup","name":"Nielsen Norman Group","url":"https://www.nngroup.com/","category":"交互设计","region":"国际 · 用户体验研究","desc":"用户体验研究、文章和培训资源，适合学习可用性、用户研究及交互评估；培训与咨询为付费服务。","access":"正常","tags":["交互设计","用户体验","UX","用户研究","可用性"]},
+  {"id":"ixdf","name":"IxDF","url":"https://ixdf.org/","category":"交互设计","region":"国际 · UX / UI 学习平台","desc":"用户体验与界面设计学习资源和课程，适合系统学习设计方法；课程与会员通常收费。","access":"正常","tags":["交互设计","UI","UX","设计方法"]},
+
   {id:'everyday-practice',name:'Everyday Practice',url:'https://everyday-practice.com',category:'品牌设计',region:'设计工作室 · 动态海报',desc:'动态海报网站，作品齐全且有系列化、整套化的展示，适合参考完整的设计项目呈现逻辑。',access:'正常',tags:['动态海报','系列设计','项目展示','作品集','品牌设计','海报']},
   {id:'odd-hyphen',name:'Odd Hyphen',url:'https://www.odd-hyphen.com',category:'品牌设计',region:'平面设计 · 配色与版式',desc:'以大胆配色、前卫版式为特点，作品质量高、数量多，是版式设计的优质灵感库。',access:'正常',tags:['大胆配色','前卫版式','版式设计','平面设计','品牌设计']},
   {id:'sulki-min',name:'Sulki & Min',url:'https://www.sulki-min.com',category:'品牌设计',region:'韩国 · 实验性平面设计',desc:'聚焦韩国平面、展览、出版物类设计，风格偏向实验性与探索性，还会标注印刷工艺、色彩、字体等细节，适合研究设计落地的技术参考。',access:'正常',tags:['韩国','实验设计','展览','出版物','印刷工艺','色彩','字体','品牌设计']},
@@ -326,7 +343,7 @@ function normalizeLinks(value) {
     let id=typeof x.id==='string' && /^[a-zA-Z0-9_-]{1,100}$/.test(x.id)?x.id:'custom-'+crypto.randomUUID();
     if(ids.has(id)) id='custom-'+crypto.randomUUID(); ids.add(id); urls.add(urlKey(url));
     const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
-    return [{id,name:text(x.name,80),url,category:['作品集','品牌设计','出版资讯','灵感图库','字体排版','其他'].includes(x.category)?x.category:'其他',region:text(x.region,60),desc:text(x.desc,220),access:['正常','需要代理','加载较慢','备注待补充'].includes(x.access)?x.access:'正常',tags:Array.isArray(x.tags)?x.tags.filter(t=>typeof t==='string').slice(0,8).map(t=>t.slice(0,40)):[],custom:true}];
+    return [{id,name:text(x.name,80),url,category:['产品设计','环境设计','视觉传达','交互设计','作品集','品牌设计','出版资讯','灵感图库','字体排版','其他'].includes(x.category)?x.category:'其他',region:text(x.region,60),desc:text(x.desc,220),access:['正常','需要代理','加载较慢','备注待补充'].includes(x.access)?x.access:'正常',tags:Array.isArray(x.tags)?x.tags.filter(t=>typeof t==='string').slice(0,8).map(t=>t.slice(0,40)):[],custom:true}];
   });
 }
 function allLinks() { return [...starterLinks, ...customLinks]; }

@@ -252,7 +252,7 @@
 
     <aside class="tips">
       <div class="tips-icon">✳</div>
-      <div><h3>多语言搜索小技巧</h3><p>在 Pinterest 等灵感平台搜索时，可以把同一个主题换成不同语言尝试，例如品牌设计：<code>Brand Design</code>、<code>ブランドデザイン</code>、<code>브랜드 디자인</code>。不同语言的结果可能带来不同的视觉参考。部分网站可能加载较慢或受网络环境影响。</p></div>
+      <div><h3>多语言搜索小技巧</h3><p>在 Pinterest 等灵感平台搜索时，可以把同一个主题换成不同语言尝试，例如品牌设计：<code>Brand Design</code>、<code>ブランドデザイン</code>、<code>브랜드 디자인</code>。不同语言的结果可能带来不同的视觉参考。访问批注：🪜 表示原有备注注明需要代理 / VPN；◷ 表示加载较慢；🌐 表示网络待测试；？ 表示访问状态待确认。是否能直连取决于地区与运营商，待测试不代表需要代理。</p></div>
     </aside>
   </main>
   <footer><span>LINK SHELF © PERSONAL DESIGN INDEX</span><span>收藏与自定义链接保存在当前浏览器中；可用右上角导出备份。</span></footer>
@@ -269,7 +269,7 @@
     </div>
     <div class="field"><label for="siteDesc">用途备注</label><input id="siteDesc" maxlength="220" placeholder="这个网站适合用来参考什么？"></div>
     <div class="form-grid">
-      <div class="field"><label for="siteAccess">访问提示</label><select id="siteAccess"><option value="正常">未注明特殊要求</option><option value="需要代理">需要代理 / VPN</option><option value="加载较慢">加载较慢</option><option value="备注待补充">待测试 / 待补充</option></select></div>
+      <div class="field"><label for="siteAccess">访问提示</label><select id="siteAccess"><option value="正常">网络待测试 / 未注明特殊要求</option><option value="需要代理">🪜 需要代理 / VPN</option><option value="加载较慢">加载较慢</option><option value="备注待补充">待测试 / 待补充</option></select></div>
       <div class="field"><label for="siteTags">关键词（用逗号分开）</label><input id="siteTags" maxlength="120" placeholder="品牌, 海报, 排版"></div>
     </div>
     <div class="dialog-actions"><button type="button" class="action-btn" id="cancelAdd">取消</button><button type="submit" class="action-btn primary">保存网站</button></div>
@@ -333,8 +333,8 @@ function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char
 function accessChip(access) {
   if (access === '需要代理') return '<span class="chip warn proxy-required" title="通常需要代理工具，实际可访问性取决于你的网络">🪜 需要代理 / VPN</span>';
   if (access === '加载较慢') return '<span class="chip warn">◷ 加载较慢</span>';
-  if (access === '备注待补充') return '<span class="chip">？ 待确认</span>';
-  return '<span class="chip good">✓ 暂无特别备注</span>';
+  if (access === '备注待补充') return '<span class="chip">？ 访问状态待确认</span>';
+  return '<span class="chip" title="尚未验证你所在网络是否可以直连；如无法打开，可编辑访问提示">🌐 网络待测试</span>';
 }
 function cardMarkup(item) {
   const isFav = favorites.has(item.id);

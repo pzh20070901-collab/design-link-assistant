@@ -212,6 +212,9 @@
 .translation-note p { margin:8px 0 0; color:var(--muted); line-height:1.7; }
 #translateToggle[aria-pressed="true"] { background:#543014; color:#ffd39a; }
 @media(max-width:620px) { .card-foot { flex-direction:column; align-items:flex-start; } }
+.source-badge { display:inline-flex; align-self:flex-start; padding:5px 9px; margin:0 0 10px; border-radius:7px; font-size:11px; background:#303038; color:#d6d6df; }
+.source-badge.provided { background:#283b50; color:#a9d6ff; }
+.source-badge.collected { background:#283e32; color:#abe9c2; }
 </style>
 </head>
 <body>
@@ -328,6 +331,9 @@ const starterLinks = [
   {id:'its-nice-that',name:'It’s Nice That',url:'https://www.itsnicethat.com/',category:'出版资讯',region:'国际 · 创意设计资讯',desc:"创意设计资讯平台，覆盖平面、插画、摄影、艺术等创意领域，兼具灵感参考与行业趋势资讯。",access:'正常',tags:['创意资讯','插画','趋势']}
 ];
 document.getElementById('refreshBtn').addEventListener('click', () => window.location.reload());
+const COLLECTED_IDS = new Set(['core77','yanko-design','red-dot','archdaily','gooood','landezine','segd','pentagram','brand-new','zcool','nngroup','ixdf']);
+const PROVIDED_IDS = new Set(['everyday-practice','odd-hyphen','sulki-min','pinterest','sakaria','toiletpaper','ndc','design-everywhere','fonts-in-use','its-nice-that']);
+function sourceLabel(item) { if(item.custom || PROVIDED_IDS.has(item.id))return '<span class="source-badge provided">👤 你提供</span>';if(COLLECTED_IDS.has(item.id))return '<span class="source-badge collected">🔎 我收集</span>';return '<span class="source-badge original">📎 原文件收录</span>'; }
 const STORAGE_LINKS = 'linkshelf_custom_v1';
 const STORAGE_FAVS = 'linkshelf_favorites_v1';
 let customLinks = normalizeLinks(readStorage(STORAGE_LINKS, []));
@@ -372,6 +378,7 @@ function cardMarkup(item) {
   return `<article class="card">
     <div class="card-top"><span class="category-label">${escapeHtml(item.category || '其他')}</span><button class="favorite ${isFav?'on':''}" data-fav="${escapeHtml(item.id)}" aria-label="${isFav?'取消收藏':'加入收藏'}" aria-pressed="${isFav}" title="${isFav?'取消收藏':'加入收藏'}">${isFav?'★':'☆'}</button></div>
     <h3><a href="${escapeHtml(destinationUrl(item.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a></h3>
+    ${sourceLabel(item)}
     <div class="region">${escapeHtml(item.region || '未分类')} ${isCustom?' · 我的添加':''}</div>
     <p class="desc">${escapeHtml(item.desc || '尚无用途备注。')}</p>
     <div class="card-foot"><div class="chips">${accessChip(item.access || '正常')}${(item.tags||[]).slice(0,2).map(tag=>`<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div><div class="visit-actions"><a class="visit translate-link" href="${escapeHtml(translationUrl(item.url))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(item.name)}：翻译为简体中文" title="Google 网页翻译，可能需要代理">🌐 中文翻译</a><a class="visit" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">原站 ↗</a></div></div>

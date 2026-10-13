@@ -205,13 +205,14 @@
   @media(max-width:480px) { .grid { grid-template-columns:1fr; } .section-head { flex-wrap:wrap; } .card { min-height:180px; } }
   @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } }
 .proxy-required { background:#543014!important; color:#ffd39a!important; border:1px solid #bb793d; font-weight:700; }
+.header-actions { display:flex; align-items:center; gap:14px; }
 </style>
 </head>
 <body>
 <div class="app">
   <header class="topbar">
     <div class="brand"><span class="brand-mark">↗</span> LINK SHELF <span style="color:var(--muted);font-weight:500;letter-spacing:.04em">/ DESIGN</span></div>
-    <div class="top-note">A PERSONAL INDEX FOR VISUAL INSPIRATION</div>
+    <div class="header-actions"><div class="top-note">A PERSONAL INDEX FOR VISUAL INSPIRATION</div><button type="button" class="icon-btn" id="refreshBtn" aria-label="刷新页面" title="刷新页面">🍟</button></div>
   </header>
 
   <section class="hero">
@@ -302,6 +303,7 @@ const starterLinks = [
   {id:'fonts-in-use',name:'Fonts In Use',url:'https://fontsinuse.com/',category:'字体排版',region:'全球 · 字体实际应用案例',desc:'汇集真实设计中的字体应用案例，可以直观研究字体搭配与排版成品。',access:'正常',tags:['字体','排版','字形']},
   {id:'its-nice-that',name:'It’s Nice That',url:'https://www.itsnicethat.com/',category:'出版资讯',region:'国际 · 创意设计资讯',desc:'创意设计资讯平台，覆盖插画、平面、摄影、艺术等创意领域与行业趋势。',access:'正常',tags:['创意资讯','插画','趋势']}
 ];
+document.getElementById('refreshBtn').addEventListener('click', () => window.location.reload());
 const STORAGE_LINKS = 'linkshelf_custom_v1';
 const STORAGE_FAVS = 'linkshelf_favorites_v1';
 let customLinks = normalizeLinks(readStorage(STORAGE_LINKS, []));

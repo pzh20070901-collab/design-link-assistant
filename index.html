@@ -261,7 +261,7 @@
       <button class="filter" data-category="出版资讯">出版 / 资讯</button>
       <button class="filter" data-category="灵感图库">灵感图库</button>
       <button class="filter" data-category="字体排版">字体 / 排版</button>
-      <button class="filter" data-category="其他">其他</button><button class="filter" data-category="我的收藏">★ 站长收录</button>
+      <button class="filter" data-category="其他">其他</button><button class="filter" data-category="我的收藏">★ 收藏</button>
     </div>
     <div class="tool-actions"><button type="button" class="action-btn" id="translateToggle" aria-pressed="true" title="通过 Google 翻译打开简体中文版本">🌐 中文翻译：开</button>
       <button class="icon-btn" id="exportBtn" title="导出备份" aria-label="导出备份">⇩</button>
@@ -414,7 +414,7 @@ function render() {
   document.getElementById('linkGrid').innerHTML = items.map(cardMarkup).join('');
   document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
   document.getElementById('resultCount').textContent = `显示 ${items.length} 个网站 · ${translationEnabled ? '点击名称打开中文翻译版 · 可用“原站”直接访问' : '点击名称直接访问 · 可用“中文翻译”查看中文版本'}`;
-  document.getElementById('listTitle').textContent = currentCategory === '全部' ? '精选设计网站' : currentCategory === '我的收藏' ? '站长收录' : currentCategory;
+  document.getElementById('listTitle').textContent = currentCategory === '全部' ? '精选设计网站' : currentCategory === '我的收藏' ? '收藏' : currentCategory;
   document.getElementById('totalCount').textContent = all.length;
   document.getElementById('favoriteCount').textContent = favorites.size;
   document.querySelectorAll('[data-fav]').forEach(button => button.addEventListener('click', () => {

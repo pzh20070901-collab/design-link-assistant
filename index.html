@@ -204,6 +204,7 @@
   @media(max-width:900px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media(max-width:480px) { .grid { grid-template-columns:1fr; } .section-head { flex-wrap:wrap; } .card { min-height:180px; } }
   @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } }
+.proxy-required { background:#543014!important; color:#ffd39a!important; border:1px solid #bb793d; font-weight:700; }
 </style>
 </head>
 <body>
@@ -330,7 +331,7 @@ function allLinks() { return [...starterLinks, ...customLinks]; }
 function saveState() { try { localStorage.setItem(STORAGE_LINKS, JSON.stringify(customLinks)); localStorage.setItem(STORAGE_FAVS, JSON.stringify([...favorites])); return true; } catch { showToast('浏览器无法保存，请导出备份避免丢失'); return false; } }
 function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 function accessChip(access) {
-  if (access === '需要代理') return '<span class="chip warn">🪜 需要代理 / VPN</span>';
+  if (access === '需要代理') return '<span class="chip warn proxy-required" title="通常需要代理工具，实际可访问性取决于你的网络">🪜 需要代理 / VPN</span>';
   if (access === '加载较慢') return '<span class="chip warn">◷ 加载较慢</span>';
   if (access === '备注待补充') return '<span class="chip">？ 待确认</span>';
   return '<span class="chip good">✓ 暂无特别备注</span>';

@@ -308,13 +308,13 @@
     <div class="dialog-actions"><button type="button" class="action-btn" id="cancelAdd">取消</button><button type="submit" class="action-btn primary">保存网站</button></div>
   </form>
 </dialog>
-<dialog id="utilityDialog" aria-labelledby="utilityTitle"><div class="dialog-head"><h3 id="utilityTitle">📌 实用网站</h3><button type="button" class="icon-btn" id="closeUtility" aria-label="关闭实用网站合集">×</button></div><div class="dialog-body"><p class="style-note">👤 站长收录 · Steam 官方下载、Winstep 桌面美化与电脑版代理工具</p><div class="grid" id="utilityGrid"></div></div></dialog>
+<dialog id="utilityDialog" aria-labelledby="utilityTitle"><div class="dialog-head"><h3 id="utilityTitle">📌 实用网站</h3><button type="button" class="icon-btn" id="closeUtility" aria-label="关闭实用网站合集">×</button></div><div class="dialog-body"><p class="style-note">👤 站长收录 · Steam 官方下载、Winstep 桌面美化与电脑版梯子</p><div class="grid" id="utilityGrid"></div></div></dialog>
 <input id="importFile" type="file" accept="application/json,.json" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 const starterLinks = [
-  {id:'desktop-proxy-share',name:'电脑版代理工具 🪜',url:'https://share.feijipan.com/s/kqb8kjTj',category:'置顶',region:'电脑软件 · 用户提供的网盘分享',desc:'你提供的电脑版代理工具网盘分享链接。具体软件名称、版本、支持系统和文件安全性尚未验证，请自行核对来源与文件。',access:'备注待补充',tags:['代理','VPN','梯子','电脑','网盘','实用网站']},
+  {id:'desktop-proxy-share',name:'电脑版梯子 🪜',url:'https://share.feijipan.com/s/kqb8kjTj',category:'置顶',region:'电脑软件 · 梯子 / 代理工具 · 邀请码：YHXWOu2a',desc:'站长收录的电脑版梯子网盘分享链接。邀请码：YHXWOu2a。具体软件名称、版本、支持系统和文件安全性尚未验证，请自行核对来源与文件。',access:'备注待补充',tags:['代理','VPN','梯子','电脑','网盘','实用网站']},
   {id:'winstep',name:'Winstep 桌面美化',url:'https://winstep.apsgo.cn/zh-tw',category:'置顶',region:'Windows · 桌面增强工具',desc:'你提供的 APSGO 下载介绍页，包含 Winstep 桌面增强套件、Dock、工具栏与主题功能，并提供开发商官网入口。',access:'正常',tags:['桌面美化','Windows','Dock','实用网站']},
   {id:'steam-official',name:'Steam 官方下载',url:'https://store.steampowered.com/about/?l=schinese',category:'置顶',region:'Valve · Steam 官方网站',desc:'Steam 官方客户端下载安装页面。进入官网后选择适合电脑系统的安装程序；手机请使用官方移动应用入口。网络访问情况因地区和运营商而异。',access:'正常',tags:['Steam','官网下载','游戏','客户端','置顶']},
   {"id":"core77","name":"Core77","url":"https://www.core77.com/","category":"产品设计","region":"国际 · 工业设计资讯","desc":"工业设计资讯与设计师社区，适合研究产品案例、设计过程及行业话题。","access":"正常","tags":["工业设计","产品设计","设计过程"]},

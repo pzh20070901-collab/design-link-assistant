@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>LINK SHELF — 设计灵感导航</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: light-dark(#f5f3ee, #151614);
+    --surface: light-dark(#fffefa, #20211e);
+    --surface-2: light-dark(#eeece5, #292a26);
+    --ink: light-dark(#20221d, #f2f0e8);
+    --muted: light-dark(#73756c, #aaa99e);
+    --line: light-dark(#deddd4, #3c3d36);
+    --accent: light-dark(#c6f36c, #c6f36c);
+    --accent-ink: #1e2814;
+    --alert: light-dark(#b85c40, #ff997b);
+    --shadow: 0 12px 36px rgba(25, 26, 19, .06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  a { color: inherit; }
+  .app { min-height: 100vh; background: var(--bg); }
+  .topbar { height: 68px; padding: 0 clamp(18px, 4vw, 64px); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 850; letter-spacing: .15em; }
+  .brand-mark { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); font-weight: 900; font-size: 16px; letter-spacing: 0; }
+  .top-note { color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+  .hero { padding: clamp(36px, 7vw, 88px) clamp(18px, 7vw, 108px) 46px; position: relative; overflow: hidden; }
+  .hero:after { content: "L/S"; position: absolute; right: 5vw; top: 22px; font-size: clamp(100px, 20vw, 280px); line-height: .9; font-weight: 900; letter-spacing: -.12em; color: var(--ink); opacity: .035; pointer-events: none; }
+  .eyebrow { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 22px; color: var(--muted); text-transform: uppercase; letter-spacing: .18em; font-size: 11px; font-weight: 750; }
+  .eyebrow:before { content: ""; width: 24px; height: 2px; background: var(--ink); }
+  h1 { margin: 0; max-width: 900px; font-weight: 780; letter-spacing: -.065em; font-size: clamp(44px, 8vw, 100px); line-height: .98; }
+  h1 span { color: var(--muted); font-weight: 400; }
+  .hero-bottom { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 18px; align-items: end; justify-content: space-between; }
+  .intro { max-width: 480px; margin: 0; line-height: 1.8; color: var(--muted); font-size: 14px; }
+  .stats { display: flex; gap: 26px; }
+  .stat strong { display: block; font-size: 25px; letter-spacing: -.05em; }
+  .stat small { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .12em; }
+  .toolbar { position: sticky; top: 0; z-index: 10; padding: 15px clamp(18px, 4vw, 64px); background: var(--bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .search-wrap { position:relative; min-width: 220px; flex: 1 1 300px; max-width: 500px; display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; padding: 0 13px; height: 43px; }
+  .search-wrap svg { width: 17px; height: 17px; stroke: var(--muted); flex: 0 0 auto; }
+  .search-wrap input { width: 100%; min-width: 0; outline: 0; border: 0; background: transparent; color: var(--ink); font-size: 13px; }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-suggestions { display:none; position:absolute; top:calc(100% + 10px); left:0; right:0; z-index:50; max-height: min(60vh, 420px); overflow:auto; background:#202023; border:1px solid #38383d; border-radius:18px; padding:7px; box-shadow:0 16px 40px #0008; }
+  .search-suggestions.show { display:block; }
+  .suggestion { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; border:0; border-radius:12px; padding:12px; background:transparent; color:#f7f7f8; text-align:left; }
+  .suggestion:active,.suggestion:hover { background:#34343a; }
+  .suggestion strong { display:block; font-size:14px; }
+  .suggestion small { display:block; color:#aaaab2; font-size:11px; margin-top:3px; overflow-wrap:anywhere; }
+  .suggestion .arrow { color:#ff4f8b; font-size:20px; }
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; flex: 1 1 360px; }
+  .filter { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 9px 13px; font-size: 12px; white-space: nowrap; transition: .18s ease; }
+  .filter:hover, .filter.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .tool-actions { display: flex; gap: 8px; margin-left: auto; }
+  .icon-btn, .action-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; height: 40px; padding: 0 12px; font-size: 12px; white-space: nowrap; }
+  .icon-btn { width: 40px; padding: 0; font-size: 16px; }
+  .action-btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 750; }
+  main { padding: 38px clamp(18px, 4vw, 64px) 76px; }
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+  .section-head h2 { margin: 0; font-size: 21px; letter-spacing: -.045em; }
+  .section-head p { color: var(--muted); margin: 0; font-size: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; padding: 19px 19px 16px; min-height: 218px; display: flex; flex-direction: column; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; position: relative; overflow: hidden; }
+  .card:hover { transform: translateY(-3px); border-color: light-dark(#aaa99c, #62645a); box-shadow: var(--shadow); }
+  .card-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .category-label { font-size: 10px; text-transform: uppercase; letter-spacing: .13em; color: var(--muted); font-weight: 760; }
+  .favorite { border: 0; width: 31px; height: 31px; border-radius: 9px; background: var(--surface-2); color: var(--muted); font-size: 18px; line-height: 1; }
+  .favorite.on { background: var(--accent); color: var(--accent-ink); }
+  .card h3 { margin: 14px 0 7px; font-size: 21px; line-height: 1.15; letter-spacing: -.04em; font-weight: 760; }
+  .card h3 a { text-decoration: none; }
+  .card h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .region { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .desc { color: var(--muted); font-size: 12px; line-height: 1.65; margin: 0 0 18px; }
+  .card-foot { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 5px; padding: 5px 7px; font-size: 10px; background: var(--surface-2); color: var(--muted); }
+  .chip.warn { background: light-dark(#fbe8df, #452b23); color: var(--alert); }
+  .chip.good { background: light-dark(#edf6dc, #2e3922); color: light-dark(#536b32, #c6f36c); }
+  .visit { text-decoration: none; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 750; white-space: nowrap; }
+  .visit span { font-size: 15px; }
+  .empty { display: none; padding: 60px 20px; text-align: center; border: 1px dashed var(--line); border-radius: 15px; color: var(--muted); }
+  .tips { margin-top: 48px; background: var(--surface-2); border-radius: 17px; padding: 23px 25px; display: flex; align-items: start; gap: 20px; }
+  .tips-icon { width: 38px; height: 38px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); border-radius: 11px; font-size: 18px; flex: 0 0 auto; }
+  .tips h3 { margin: 0 0 8px; font-size: 15px; }
+  .tips p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
+  .tips code { background: var(--surface); padding: 2px 5px; border-radius: 4px; color: var(--ink); }
+  footer { padding: 20px clamp(18px, 4vw, 64px) 28px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; }
+  dialog { width: min(500px, calc(100% - 28px)); border: 1px solid var(--line); border-radius: 17px; padding: 0; background: var(--surface); color: var(--ink); box-shadow: 0 25px 90px rgba(0,0,0,.25); }
+  dialog::backdrop { background: rgba(12, 13, 10, .48); backdrop-filter: blur(3px); }
+  .dialog-head { padding: 20px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+  .dialog-head h3 { margin: 0; font-size: 18px; }
+  .dialog-body { padding: 22px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; font-weight: 750; color: var(--muted); margin-bottom: 7px; }
+  .field input, .field select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; outline: 0; background: var(--bg); color: var(--ink); font-size: 13px; }
+  .field input:focus, .field select:focus { border-color: var(--muted); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dialog-actions { display: flex; justify-content: end; gap: 8px; margin-top: 20px; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 10px; font-size: 12px; box-shadow: var(--shadow); transition: .22s; z-index: 99; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+  @media (max-width: 1020px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .toolbar { position: static; } }
+  @media (max-width: 620px) { .top-note { display: none; } .hero { padding-top: 46px; } .hero-bottom { align-items: start; flex-direction: column; } .toolbar { padding-top: 12px; padding-bottom: 12px; } .filter-row { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; } .filter { padding: 8px 11px; } .tool-actions { margin-left: 0; } .grid { grid-template-columns: 1fr; } .card { min-height: 195px; } .section-head { align-items: start; flex-direction: column; gap: 6px; } .tips { padding: 19px; gap: 13px; } footer { flex-direction: column; } .form-grid { grid-template-columns: 1fr; gap: 0; } }
+
+  /* Search-first, Apple Music-inspired visual refresh */
+  :root { color-scheme: dark; --bg:#050505; --surface:#19191c; --surface-2:#252528; --ink:#f7f7f8; --muted:#a4a4aa; --line:#303034; --accent:#ff4f8b; --accent-ink:#fff; --shadow:0 12px 30px rgba(0,0,0,.28); }
+  body,.app { background:#050505; color:#f7f7f8; }
+  .topbar { height:64px; border:0; padding:0 28px; }
+  .brand { letter-spacing:.04em; font-size:12px; }
+  .brand-mark { border-radius:50%; background:#29252f; color:#fff; }
+  .hero { padding:30px 34px 18px; }
+  .hero:after { content:none; }
+  .eyebrow { display:none; }
+  h1 { font-size:clamp(36px,6vw,54px); line-height:1.08; letter-spacing:-.04em; }
+  h1 span { display:none; }
+  .hero-bottom { margin-top:10px; }
+  .intro { color:#a4a4aa; font-size:13px; }
+  .stats { gap:15px; }
+  .stat strong { font-size:18px; }
+  .stat small { font-size:9px; }
+  .toolbar { border:0; background:#050505; padding:8px 34px 18px; gap:12px; }
+  .search-wrap { max-width:none; flex:1 1 100%; height:54px; background:#202023; border:0; border-radius:999px; padding:0 18px; }
+  .search-wrap svg { width:21px; height:21px; stroke:#f6f6f8; }
+  .search-wrap input { font-size:16px; }
+  .search-wrap input::placeholder { color:#88888e; }
+  .filter-row { flex:1 1 100%; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; overflow:visible; }
+  .filter { min-height:92px; border:0; border-radius:20px; padding:16px; white-space:normal; text-align:left; display:flex; align-items:end; justify-content:flex-start; color:#fff; font-size:16px; font-weight:750; background:#f04e8a; }
+  .filter:nth-child(2) { background:#f04e8a; }
+  .filter:nth-child(3) { background:#e94380; }
+  .filter:nth-child(4) { background:#f04e8a; }
+  .filter:nth-child(5) { background:#d84884; }
+  .filter:nth-child(6) { background:#7967d9; }
+  .filter:nth-child(7) { background:#197e70; }
+  .filter:hover,.filter.active { color:#fff; border:0; filter:brightness(1.12); }
+  .tool-actions { width:100%; margin:0; justify-content:flex-end; }
+  .icon-btn,.action-btn { background:#202023; border:0; color:#f7f7f8; border-radius:999px; }
+  .action-btn.primary { background:#ff4f8b; color:#fff; }
+  main { padding:14px 34px 70px; }
+  .section-head { margin-bottom:14px; }
+  .section-head h2 { font-size:24px; }
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .card { min-height:180px; border:0; border-radius:17px; padding:17px; background:#222226; }
+  .card:nth-child(6n+1) { background:#f04e8a; color:white; }
+  .card:nth-child(6n+2) { background:#6e83df; color:white; }
+  .card:nth-child(6n+3) { background:#8d70d9; color:white; }
+  .card:nth-child(6n+4) { background:#168f7f; color:white; }
+  .card:nth-child(6n+5) { background:#b82c61; color:white; }
+  .card:nth-child(6n) { background:#333338; color:white; }
+  .card .category-label,.card .region,.card .desc { color:rgba(255,255,255,.82); }
+  .card .favorite { background:rgba(0,0,0,.18); color:white; }
+  .card .favorite.on { background:#fff; color:#ed4381; }
+  .card-foot { border-color:rgba(255,255,255,.25); }
+  .chip { background:rgba(0,0,0,.15); color:white; }
+  .chip.warn,.chip.good { background:rgba(0,0,0,.2); color:#fff; }
+  .visit { color:white; }
+  .tips { background:#1c1c20; }
+  .tips-icon { background:#ff4f8b; color:white; }
+  footer { border-color:#29292d; }
+  @media(max-width:620px) {
+    .topbar { height:54px; padding:0 22px; }
+    .top-note { display:none; }
+    .hero { padding:24px 22px 12px; }
+    h1 { font-size:40px; }
+    .hero-bottom { gap:12px; }
+    .stats { width:100%; justify-content:space-between; }
+    .toolbar { padding:8px 18px 14px; gap:12px; }
+    .search-wrap { height:52px; }
+    .filter-row { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .filter { min-height:86px; border-radius:19px; padding:13px; font-size:15px; }
+    .tool-actions { justify-content:flex-start; }
+    main { padding:14px 18px 50px; }
+    .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .card { min-height:195px; padding:13px; border-radius:15px; }
+    .card h3 { font-size:17px; overflow-wrap:anywhere; }
+    .card .desc { font-size:11px; }
+    .card-foot { align-items:flex-start; flex-direction:column; }
+    .tips { padding:16px; }
+  }
+
+
+  /* Compact navigation and accessible controls */
+  .app { max-width:1440px; margin:auto; }
+  .toolbar { position:relative; }
+  .filter-row { display:flex; flex-wrap:wrap; gap:8px; }
+  .filter,.filter:nth-child(n) { min-height:40px; padding:10px 15px; border-radius:999px; background:var(--surface-2); font-size:13px; align-items:center; }
+  .filter.active { background:var(--accent); box-shadow:0 0 0 2px #ff4f8b44; }
+  .grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .card:nth-child(n) { background:#202024; }
+  .card { border:1px solid var(--line); }
+  .card:hover { border-color:var(--accent); }
+  .card h3 { overflow-wrap:anywhere; }
+  .manage { display:flex; gap:8px; margin-top:14px; }
+  .manage button { border:0; background:var(--surface-2); color:var(--ink); border-radius:6px; padding:6px 10px; font-size:12px; }
+  button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+  .suggestion[aria-selected="true"] { background:#34343a; }
+  .search-wrap:focus-within { box-shadow:0 0 0 2px var(--accent); }
+  .tool-actions { flex-wrap:wrap; }
+  dialog { max-height:90vh; overflow:auto; }
+  .sort { background:var(--surface); color:var(--ink); border:1px solid var(--line); padding:8px; border-radius:8px; }
+  @media(max-width:900px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media(max-width:480px) { .grid { grid-template-columns:1fr; } .section-head { flex-wrap:wrap; } .card { min-height:180px; } }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">↗</span> LINK SHELF <span style="color:var(--muted);font-weight:500;letter-spacing:.04em">/ DESIGN</span></div>
+    <div class="top-note">A PERSONAL INDEX FOR VISUAL INSPIRATION</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">YOUR DESIGN BOOKMARKS</div>
+    <h1>搜索设计灵感</h1>
+    <div class="hero-bottom">
+      <p class="intro">作品集、品牌设计、字体与视觉灵感，一搜即达。</p>
+      <div class="stats"><div class="stat"><strong id="totalCount">18</strong><small>Curated links</small></div><div class="stat"><strong id="favoriteCount">0</strong><small>Favorites</small></div><div class="stat"><strong id="categoryCount">6</strong><small>Categories</small></div></div>
+    </div>
+  </section>
+
+  <section class="toolbar" aria-label="网站筛选工具">
+    <label class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+      <input id="searchInput" type="search" placeholder="输入关键词，例如：日本、字体、品牌、Pinterest" autocomplete="off" aria-label="搜索网站关键词" aria-controls="searchSuggestions" aria-expanded="false">
+      <div class="search-suggestions" id="searchSuggestions" role="listbox" aria-label="匹配的网站"></div>
+    </label>
+    <div class="filter-row" id="filters">
+      <button class="filter active" data-category="全部">全部网站</button>
+      <button class="filter" data-category="作品集">作品集 / 工作室</button>
+      <button class="filter" data-category="品牌设计">品牌设计</button>
+      <button class="filter" data-category="出版资讯">出版 / 资讯</button>
+      <button class="filter" data-category="灵感图库">灵感图库</button>
+      <button class="filter" data-category="字体排版">字体 / 排版</button>
+      <button class="filter" data-category="其他">其他</button><button class="filter" data-category="我的收藏">★ 我的收藏</button>
+    </div>
+    <div class="tool-actions">
+      <button class="icon-btn" id="exportBtn" title="导出备份" aria-label="导出备份">⇩</button>
+      <button class="action-btn" id="importBtn" title="导入以前导出的备份">导入</button>
+      <button class="action-btn primary" id="addBtn">＋ 添加网站</button>
+    </div>
+  </section>
+
+  <main>
+    <div class="section-head"><h2 id="listTitle">精选设计网站</h2><label>排序 <select class="sort" id="sortSelect" aria-label="网站排序"><option value="default">默认顺序</option><option value="name">名称 A–Z</option><option value="favorites">收藏优先</option></select></label><p id="resultCount" role="status" aria-live="polite">显示 18 个网站 · 点击卡片名称即可访问</p></div>
+    <div class="grid" id="linkGrid"></div>
+    <div class="empty" id="emptyState">没有找到匹配的网站。换个关键词，或添加一个新网站吧。</div>
+
+    <aside class="tips">
+      <div class="tips-icon">✳</div>
+      <div><h3>多语言搜索小技巧</h3><p>在 Pinterest 等灵感平台搜索时，可以把同一个主题换成不同语言尝试，例如品牌设计：<code>Brand Design</code>、<code>ブランドデザイン</code>、<code>브랜드 디자인</code>。不同语言的结果可能带来不同的视觉参考。部分网站可能加载较慢或受网络环境影响。</p></div>
+    </aside>
+  </main>
+  <footer><span>LINK SHELF © PERSONAL DESIGN INDEX</span><span>收藏与自定义链接保存在当前浏览器中；可用右上角导出备份。</span></footer>
+</div>
+
+<dialog id="addDialog">
+  <div class="dialog-head"><h3>添加到链接助手</h3><button class="icon-btn" id="closeDialog" aria-label="关闭">×</button></div>
+  <form class="dialog-body" id="addForm">
+    <div class="field"><label for="siteName">网站名称 *</label><input id="siteName" required maxlength="80" placeholder="例如：Studio Example"></div>
+    <div class="field"><label for="siteUrl">网站链接 *</label><input id="siteUrl" required type="url" placeholder="https://example.com"></div>
+    <div class="form-grid">
+      <div class="field"><label for="siteCategory">分类</label><select id="siteCategory"><option>作品集</option><option>品牌设计</option><option>出版资讯</option><option>灵感图库</option><option>字体排版</option><option>其他</option></select></div>
+      <div class="field"><label for="siteRegion">地区 / 类型</label><input id="siteRegion" maxlength="60" placeholder="例如：韩国 · 作品集"></div>
+    </div>
+    <div class="field"><label for="siteDesc">用途备注</label><input id="siteDesc" maxlength="220" placeholder="这个网站适合用来参考什么？"></div>
+    <div class="form-grid">
+      <div class="field"><label for="siteAccess">访问提示</label><select id="siteAccess"><option value="正常">未注明特殊要求</option><option value="需要代理">需要代理 / VPN</option><option value="加载较慢">加载较慢</option><option value="备注待补充">待测试 / 待补充</option></select></div>
+      <div class="field"><label for="siteTags">关键词（用逗号分开）</label><input id="siteTags" maxlength="120" placeholder="品牌, 海报, 排版"></div>
+    </div>
+    <div class="dialog-actions"><button type="button" class="action-btn" id="cancelAdd">取消</button><button type="submit" class="action-btn primary">保存网站</button></div>
+  </form>
+</dialog>
+<input id="importFile" type="file" accept="application/json,.json" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const starterLinks = [
+  {id:'notefolio',name:'Notefolio',url:'https://notefolio.net/',category:'作品集',region:'韩国 · 设计师社区',desc:'韩国设计师作品集社区，可浏览平面、品牌、插画等多类型个人项目。',access:'正常',tags:['作品集','平面设计','韩国']},
+  {id:'kashiwasato',name:'Kashiwa Sato',url:'https://kashiwasato.com',category:'品牌设计',region:'日本东京 · 佐藤可士和',desc:'日本设计师佐藤可士和的个人与项目作品参考。',access:'正常',tags:['品牌设计','日本','艺术指导']},
+  {id:'idea-mag',name:'IDEA Magazine',url:'https://www.idea-mag.com/',category:'出版资讯',region:'日本 · 设计杂志',desc:'日本《IDEA》设计杂志官网，适合关注平面设计、字体与视觉文化。',access:'正常',tags:['杂志','平面设计','字体']},
+  {id:'ndc',name:'NDC Projects',url:'https://www.ndc.co.jp/zh/projects/',category:'作品集',region:'日本 · 日本设计中心',desc:'日本设计中心项目案例库，覆盖公共视觉、包装、导视等方向，风格简约实用。',access:'正常',tags:['案例库','包装','导视','品牌']},
+  {id:'farmgroup',name:'FARMGROUP',url:'https://farmgroup.co.th/work/',category:'品牌设计',region:'泰国曼谷 · 创意与设计咨询',desc:'品牌策略、品牌识别、包装与品牌体验案例。注：这是泰国 FARMGROUP，与新加坡 Foreign Policy Design 是不同机构。',access:'正常',tags:['品牌设计','包装','泰国']},
+  {id:'tnop',name:'TNOP',url:'https://www.tnop.com/',category:'作品集',region:'泰国 · 平面设计工作室',desc:'泰国先锋平面设计工作室，可作为视觉系统与平面项目参考。',access:'正常',tags:['平面设计','工作室','泰国']},
+  {id:'round-nine',name:'Round and Nine',url:'https://roundandnine.com',category:'品牌设计',region:'泰国曼谷 · 精品品牌设计',desc:'曼谷本土品牌设计工作室，适合浏览品牌视觉与设计项目。',access:'正常',tags:['品牌设计','泰国','工作室']},
+  {id:'foreign-policy',name:'Foreign Policy Design',url:'https://www.foreignpolicy.design/',category:'品牌设计',region:'新加坡 · 独立设计工作室',desc:'新加坡独立品牌与设计工作室，可参考品牌识别和视觉表达。',access:'正常',tags:['品牌设计','新加坡','工作室']},
+  {id:'daikoku',name:'Daikoku Design',url:'https://daikoku.ndc.co.jp',category:'作品集',region:'日本东京 · 大黑大悟',desc:'日本设计师大黑大悟的个人项目与作品参考。',access:'正常',tags:['设计师','日本','作品集']},
+  {id:'fukao',name:'Fukao Daiki',url:'https://fukao.ndc.co.jp',category:'作品集',region:'日本东京 · 深尾大树',desc:'日本设计师深尾大树的作品与项目参考。',access:'正常',tags:['设计师','日本','作品集']},
+  {id:'amorepacific',name:'Amorepacific Design',url:'https://design.amorepacific.com/en/',category:'品牌设计',region:'韩国 · 品牌与设计项目',desc:'Amorepacific 设计项目展示，可参考品牌、包装与产品视觉。',access:'正常',tags:['品牌','包装','韩国']},
+  {id:'brenden',name:'BRENDEN',url:'https://brenden.kr/',category:'品牌设计',region:'韩国首尔 · 品牌创意团队',desc:'韩国品牌创意团队，覆盖品牌战略、视觉识别、字体、包装与线上线下体验。',access:'正常',tags:['品牌设计','品牌策略','韩国']},
+  {id:'pinterest',name:'Pinterest',url:'https://ca.pinterest.com/',category:'灵感图库',region:'全球 · 视觉灵感搜索',desc:'视觉灵感搜索与收藏平台。可尝试英文、日文、韩文等不同语言关键词。',access:'需要代理',tags:['灵感','情绪板','图片搜索']},
+  {id:'sakaria',name:'Sakaria',url:'https://www.sakaria.se/',category:'灵感图库',region:'网站简介待补充',desc:'已收录的网站；具体内容与用途尚待确认。',access:'备注待补充',tags:['待分类','灵感']},
+  {id:'toiletpaper',name:'Toiletpaper Magazine',url:'https://www.toiletpapermagazine.org/',category:'出版资讯',region:'国际 · 艺术与视觉出版',desc:'具有鲜明视觉风格的出版项目参考；按你的备注，网站加载可能较慢。',access:'加载较慢',tags:['杂志','艺术指导','摄影']},
+  {id:'design-everywhere',name:'Design Everywhere Library',url:'https://designeverywhere.co/library/1',category:'灵感图库',region:'全球 · 设计灵感库',desc:'收录品牌、平面与包装等案例，适合审美积累与版式学习。',access:'需要代理',tags:['案例库','品牌','平面','包装']},
+  {id:'fonts-in-use',name:'Fonts In Use',url:'https://fontsinuse.com/',category:'字体排版',region:'全球 · 字体实际应用案例',desc:'汇集真实设计中的字体应用案例，可以直观研究字体搭配与排版成品。',access:'正常',tags:['字体','排版','字形']},
+  {id:'its-nice-that',name:'It’s Nice That',url:'https://www.itsnicethat.com/',category:'出版资讯',region:'国际 · 创意设计资讯',desc:'创意设计资讯平台，覆盖插画、平面、摄影、艺术等创意领域与行业趋势。',access:'正常',tags:['创意资讯','插画','趋势']}
+];
+const STORAGE_LINKS = 'linkshelf_custom_v1';
+const STORAGE_FAVS = 'linkshelf_favorites_v1';
+let customLinks = normalizeLinks(readStorage(STORAGE_LINKS, []));
+let favorites = new Set(readArray(STORAGE_FAVS).filter(id => allLinks().some(item => item.id === id)));
+let editingId = null;
+let activeSuggestion = -1;
+let currentCategory = '全部';
+let toastTimer;
+function safeParse(value, fallback) { try { const parsed = JSON.parse(value); return parsed ?? fallback; } catch { return fallback; } }
+function readStorage(key, fallback) { try { return safeParse(localStorage.getItem(key), fallback); } catch { return fallback; } }
+function readArray(key) { const value=readStorage(key,[]); return Array.isArray(value)?value:[]; }
+function validUrl(value) { try { const u=new URL(value); return ['http:','https:'].includes(u.protocol) && !u.username && !u.password ? u.href : null; } catch { return null; } }
+function urlKey(value) { const u=new URL(value); u.hash=''; return u.href.replace(/\/$/,''); }
+function normalizeLinks(value) {
+  if(!Array.isArray(value)) return [];
+  const ids=new Set(starterLinks.map(x=>x.id)), urls=new Set(starterLinks.map(x=>urlKey(x.url)));
+  return value.slice(0,2000).flatMap(x=>{
+    if(!x || typeof x.name!=='string' || !x.name.trim() || typeof x.url!=='string')return [];
+    const url=validUrl(x.url); if(!url || urls.has(urlKey(url)))return [];
+    let id=typeof x.id==='string' && /^[a-zA-Z0-9_-]{1,100}$/.test(x.id)?x.id:'custom-'+crypto.randomUUID();
+    if(ids.has(id)) id='custom-'+crypto.randomUUID(); ids.add(id); urls.add(urlKey(url));
+    const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
+    return [{id,name:text(x.name,80),url,category:['作品集','品牌设计','出版资讯','灵感图库','字体排版','其他'].includes(x.category)?x.category:'其他',region:text(x.region,60),desc:text(x.desc,220),access:['正常','需要代理','加载较慢','备注待补充'].includes(x.access)?x.access:'正常',tags:Array.isArray(x.tags)?x.tags.filter(t=>typeof t==='string').slice(0,8).map(t=>t.slice(0,40)):[],custom:true}];
+  });
+}
+function allLinks() { return [...starterLinks, ...customLinks]; }
+function saveState() { try { localStorage.setItem(STORAGE_LINKS, JSON.stringify(customLinks)); localStorage.setItem(STORAGE_FAVS, JSON.stringify([...favorites])); return true; } catch { showToast('浏览器无法保存，请导出备份避免丢失'); return false; } }
+function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+function accessChip(access) {
+  if (access === '需要代理') return '<span class="chip warn">↗ 需要代理 / VPN</span>';
+  if (access === '加载较慢') return '<span class="chip warn">◷ 加载较慢</span>';
+  if (access === '备注待补充') return '<span class="chip">？ 待确认</span>';
+  return '<span class="chip good">✓ 暂无特别备注</span>';
+}
+function cardMarkup(item) {
+  const isFav = favorites.has(item.id);
+  const isCustom = item.custom === true;
+  return `<article class="card">
+    <div class="card-top"><span class="category-label">${escapeHtml(item.category || '其他')}</span><button class="favorite ${isFav?'on':''}" data-fav="${escapeHtml(item.id)}" aria-label="${isFav?'取消收藏':'加入收藏'}" aria-pressed="${isFav}" title="${isFav?'取消收藏':'加入收藏'}">${isFav?'★':'☆'}</button></div>
+    <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a></h3>
+    <div class="region">${escapeHtml(item.region || '未分类')} ${isCustom?' · 我的添加':''}</div>
+    <p class="desc">${escapeHtml(item.desc || '尚无用途备注。')}</p>
+    <div class="card-foot"><div class="chips">${accessChip(item.access || '正常')}${(item.tags||[]).slice(0,2).map(tag=>`<span class="chip">${escapeHtml(tag)}</span>`).join('')}</div><a class="visit" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">打开网站 <span>↗</span></a></div>
+    ${isCustom?`<div class="manage"><button data-edit="${escapeHtml(item.id)}">编辑</button><button data-delete="${escapeHtml(item.id)}">删除</button></div>`:''}
+  </article>`;
+}
+function render() {
+  const query = document.getElementById('searchInput').value.trim().toLocaleLowerCase();
+  const all = allLinks();
+  let items = all.filter(item => {
+    const categoryMatches = currentCategory === '全部' || (currentCategory === '我的收藏' ? favorites.has(item.id) : item.category === currentCategory || (currentCategory === '作品集' && item.category === '作品集'));
+    const blob = [item.name,item.url,item.category,item.region,item.desc,...(item.tags||[])].join(' ').toLocaleLowerCase();
+    return categoryMatches && query.split(/\s+/).every(word=>blob.includes(word));
+  });
+  const sort=document.getElementById('sortSelect').value;
+  if(sort==='name')items.sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
+  if(sort==='favorites')items.sort((a,b)=>Number(favorites.has(b.id))-Number(favorites.has(a.id)));
+  document.getElementById('categoryCount').textContent=new Set(all.map(x=>x.category)).size;
+  document.getElementById('linkGrid').innerHTML = items.map(cardMarkup).join('');
+  document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
+  document.getElementById('resultCount').textContent = `显示 ${items.length} 个网站 · 点击网站名称或“打开网站”直达`;
+  document.getElementById('listTitle').textContent = currentCategory === '全部' ? '精选设计网站' : currentCategory === '我的收藏' ? '我的收藏' : currentCategory;
+  document.getElementById('totalCount').textContent = all.length;
+  document.getElementById('favoriteCount').textContent = favorites.size;
+  document.querySelectorAll('[data-fav]').forEach(button => button.addEventListener('click', () => {
+    const id = button.dataset.fav;
+    if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+    saveState(); render(); showToast(favorites.has(id) ? '已加入收藏' : '已取消收藏');
+  }));
+}
+document.getElementById('filters').addEventListener('click', event => {
+  const button = event.target.closest('[data-category]');
+  if (!button) return;
+  currentCategory = button.dataset.category;
+  document.querySelectorAll('.filter').forEach(el => el.classList.toggle('active', el === button));
+  closeSuggestions(); render();
+});
+const searchInput = document.getElementById('searchInput');
+const searchSuggestions = document.getElementById('searchSuggestions');
+function renderSuggestions() {
+  const q = searchInput.value.trim().toLocaleLowerCase();
+  if (!q) { searchSuggestions.classList.remove('show'); searchInput.setAttribute('aria-expanded','false'); searchSuggestions.innerHTML=''; return; }
+  activeSuggestion=-1;
+  const matches = allLinks().filter(item => (currentCategory==='全部'||(currentCategory==='我的收藏'?favorites.has(item.id):item.category===currentCategory)) && [item.name,item.url,item.category,item.region,item.desc,...(item.tags||[])].join(' ').toLocaleLowerCase().split(' ').join(' ').includes(q)).slice(0,8);
+  searchSuggestions.innerHTML = matches.length ? matches.map(item => `<button type="button" class="suggestion" role="option" data-open-url="${escapeHtml(item.url)}"><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.region || item.url)} · ${escapeHtml(item.url)}</small></span><span class="arrow">↗</span></button>`).join('') : '<div style="padding:14px;color:#aaaab2;font-size:13px">没有匹配的网站，试试“字体”“日本”“品牌”或“韩国”。</div>';
+  searchSuggestions.classList.add('show'); searchInput.setAttribute('aria-expanded','true');
+}
+searchInput.addEventListener('input', () => { render(); renderSuggestions(); });
+searchInput.addEventListener('focus', renderSuggestions);
+searchSuggestions.addEventListener('click', event => { const btn=event.target.closest('[data-open-url]'); if(!btn)return; const url=btn.dataset.openUrl; window.open(url,'_blank','noopener,noreferrer'); searchSuggestions.classList.remove('show'); searchInput.setAttribute('aria-expanded','false'); });
+document.addEventListener('click', event => { if(!event.target.closest('.search-wrap')) { searchSuggestions.classList.remove('show'); searchInput.setAttribute('aria-expanded','false'); } });
+function closeSuggestions(){ searchSuggestions.classList.remove('show'); searchInput.setAttribute('aria-expanded','false'); activeSuggestion=-1; }
+searchInput.addEventListener('keydown', event => {
+  const options=[...searchSuggestions.querySelectorAll('[data-open-url]')];
+  if(event.key==='Escape'){closeSuggestions();return;}
+  if(!searchSuggestions.classList.contains('show'))return;
+  if(['ArrowDown','ArrowUp'].includes(event.key) && options.length){event.preventDefault();activeSuggestion=(activeSuggestion+(event.key==='ArrowDown'?1:-1)+options.length)%options.length;options.forEach((x,i)=>x.setAttribute('aria-selected',i===activeSuggestion));options[activeSuggestion].scrollIntoView({block:'nearest'});}
+  if(event.key==='Enter'&&activeSuggestion>=0){event.preventDefault();options[activeSuggestion].click();}
+});
+const dialog = document.getElementById('addDialog');
+document.getElementById('addBtn').addEventListener('click', () => { editingId=null; document.getElementById('addForm').reset(); dialog.querySelector('h3').textContent='添加网站'; dialog.showModal(); });
+document.getElementById('closeDialog').addEventListener('click', () => dialog.close());
+document.getElementById('cancelAdd').addEventListener('click', () => dialog.close());
+document.getElementById('addForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const name = document.getElementById('siteName').value.trim();
+  const url = document.getElementById('siteUrl').value.trim();
+  try { const parsed = new URL(url); if (!validUrl(url)) throw new Error(); }
+  catch { showToast('请输入有效的 http 或 https 网站链接'); return; }
+  if(!name){showToast('请输入网站名称');return;}
+  if(allLinks().some(x=>x.id!==editingId&&urlKey(x.url)===urlKey(url))){showToast('这个网站已经收录');return;}
+  const id = editingId || 'custom-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  const updated = {id, name, url, category:document.getElementById('siteCategory').value, region:document.getElementById('siteRegion').value.trim() || '自定义网站', desc:document.getElementById('siteDesc').value.trim() || '个人收藏的网站。', access:document.getElementById('siteAccess').value, tags:document.getElementById('siteTags').value.split(/[，,]/).map(s=>s.trim()).filter(Boolean).slice(0,8), custom:true};
+  if(editingId)customLinks=customLinks.map(x=>x.id===editingId?updated:x);else customLinks.unshift(updated);
+  editingId=null;
+  const saved=saveState(); event.target.reset(); dialog.close(); currentCategory = '全部'; document.querySelectorAll('.filter').forEach(el => el.classList.toggle('active', el.dataset.category === '全部')); document.getElementById('searchInput').value = ''; render(); closeSuggestions(); if(saved)showToast('网站已保存到当前浏览器');
+});
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const backup = {app:'LINK SHELF',version:1,exportedAt:new Date().toISOString(),customLinks,favorites:[...favorites]};
+  const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href=url; anchor.download='link-shelf-backup.json'; anchor.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); showToast('已导出自定义链接与收藏备份');
+});
+// Import a backup JSON created by the Export button.
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', async event => {
+  const file = event.target.files?.[0]; if (!file) return;
+  try {
+    if(file.size>2*1024*1024)throw new Error('备份不能超过 2 MB');
+    const obj = JSON.parse(await file.text());
+    if (!obj || obj.app!=='LINK SHELF' || obj.version!==1 || !Array.isArray(obj.customLinks) || !Array.isArray(obj.favorites)) throw new Error('文件格式不正确');
+    const validated=normalizeLinks(obj.customLinks);
+    if(validated.length!==obj.customLinks.length)throw new Error('备份包含无效或重复的网站，请检查后重试');
+    if (!confirm(`将导入 ${obj.customLinks.length} 个自定义网站与 ${obj.favorites.length} 个收藏。替换当前自定义链接与收藏吗？`)) return;
+    customLinks=validated; favorites=new Set(obj.favorites.filter(id=>typeof id==='string'&&allLinks().some(x=>x.id===id))); const saved=saveState(); closeSuggestions(); render(); if(saved)showToast('备份导入成功');
+  } catch (error) { showToast(error.message || '无法读取备份文件'); }
+  finally { event.target.value=''; }
+});
+function showToast(message) { const el=document.getElementById('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); }
+document.getElementById('sortSelect').addEventListener('change',render);
+document.getElementById('linkGrid').addEventListener('click',event=>{
+  const edit=event.target.closest('[data-edit]'), remove=event.target.closest('[data-delete]');
+  if(edit){const x=customLinks.find(x=>x.id===edit.dataset.edit);if(!x)return;editingId=x.id;for(const [key,field] of Object.entries({name:'siteName',url:'siteUrl',category:'siteCategory',region:'siteRegion',desc:'siteDesc',access:'siteAccess',tags:'siteTags'}))document.getElementById(field).value=key==='tags'?x.tags.join(', '):x[key];dialog.querySelector('h3').textContent='编辑网站';dialog.showModal();}
+  if(remove){const x=customLinks.find(x=>x.id===remove.dataset.delete);if(!x||!confirm('确定删除“'+x.name+'”？'))return;customLinks=customLinks.filter(y=>y.id!==x.id);favorites.delete(x.id);const saved=saveState();render();if(saved)showToast('已删除网站');}
+});
+document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='k'){event.preventDefault();searchInput.focus();}});
+window.addEventListener('storage',event=>{if([STORAGE_LINKS,STORAGE_FAVS].includes(event.key)){customLinks=normalizeLinks(readArray(STORAGE_LINKS));favorites=new Set(readArray(STORAGE_FAVS).filter(id=>allLinks().some(x=>x.id===id)));render();}});
+// Keyboard shortcut: Cmd/Ctrl + Shift + I imports a previously exported backup.
+document.addEventListener('keydown', event => { if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase()==='i') { event.preventDefault(); document.getElementById('importFile').click(); } });
+render();
+</script>
+</body>
+</html>

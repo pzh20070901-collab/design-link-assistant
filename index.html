@@ -231,6 +231,8 @@
 #utilityDialog { width:min(900px,94vw); }
 #utilityGrid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 @media(max-width:620px) { #utilityGrid { grid-template-columns:1fr; } }
+.proxy-tool-highlight h3 a,.proxy-tool-highlight .region { color:#ff6b6b!important; font-weight:700; }
+.proxy-tool-highlight { border-color:#b74949!important; }
 </style>
 </head>
 <body>
@@ -398,7 +400,7 @@ function accessChip(access) {
 function cardMarkup(item) {
   const isFav = favorites.has(item.id);
   const isCustom = item.custom === true;
-  return `<article class="card">
+  return `<article class="card ${item.id === 'desktop-proxy-share' ? 'proxy-tool-highlight' : ''}">
     <div class="card-top"><span class="category-label">${escapeHtml(item.category || '其他')}</span><button class="favorite ${isFav?'on':''}" data-fav="${escapeHtml(item.id)}" aria-label="${isFav?'取消收藏':'加入收藏'}" aria-pressed="${isFav}" title="${isFav?'取消收藏':'加入收藏'}">${isFav?'★':'☆'}</button></div>
     <h3><a href="${escapeHtml(destinationUrl(item.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a></h3>
     ${sourceLabel(item)}

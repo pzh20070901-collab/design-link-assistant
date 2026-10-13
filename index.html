@@ -345,7 +345,7 @@ const starterLinks = [
 document.getElementById('refreshBtn').addEventListener('click', () => window.location.reload());
 const COLLECTED_IDS = new Set(['core77','yanko-design','red-dot','archdaily','gooood','landezine','segd','pentagram','brand-new','zcool','nngroup','ixdf']);
 const PROVIDED_IDS = new Set(['everyday-practice','odd-hyphen','sulki-min','pinterest','sakaria','toiletpaper','ndc','design-everywhere','fonts-in-use','its-nice-that']);
-function sourceLabel(item) { if(item.custom || PROVIDED_IDS.has(item.id))return '<span class="source-badge provided">👤 ChatGPT搜索</span>';if(COLLECTED_IDS.has(item.id))return '<span class="source-badge collected">🔎 我收集</span>';return '<span class="source-badge original">👤 ChatGPT搜索（原文件）</span>'; }
+function sourceLabel(item) { if(item.custom || PROVIDED_IDS.has(item.id))return '<span class="source-badge provided">👤 ChatGPT搜索</span>';if(COLLECTED_IDS.has(item.id))return '<span class="source-badge collected">🔎 chatgpt搜索</span>';return '<span class="source-badge original">👤 ChatGPT搜索（原文件）</span>'; }
 const STORAGE_LINKS = 'linkshelf_custom_v1';
 const STORAGE_FAVS = 'linkshelf_favorites_v1';
 let customLinks = normalizeLinks(readStorage(STORAGE_LINKS, []));

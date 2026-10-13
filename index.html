@@ -226,6 +226,11 @@
 .style-searches a { background:var(--surface-2); padding:9px 10px; border-radius:8px; font-size:11px; text-decoration:none; }
 .style-searches a:hover { background:#543014; }
 @media(max-width:760px) { .style-grid { grid-template-columns:1fr; } }
+.utility-cover { border-color:#bb793d; background:#27201b!important; }
+.utility-cover .action-btn { align-self:flex-start; margin-top:auto; }
+#utilityDialog { width:min(900px,94vw); }
+#utilityGrid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media(max-width:620px) { #utilityGrid { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
@@ -303,11 +308,13 @@
     <div class="dialog-actions"><button type="button" class="action-btn" id="cancelAdd">取消</button><button type="submit" class="action-btn primary">保存网站</button></div>
   </form>
 </dialog>
+<dialog id="utilityDialog" aria-labelledby="utilityTitle"><div class="dialog-head"><h3 id="utilityTitle">📌 实用网站</h3><button type="button" class="icon-btn" id="closeUtility" aria-label="关闭实用网站合集">×</button></div><div class="dialog-body"><p class="style-note">👤 站长收录 · Steam 官方下载与 Winstep 桌面美化</p><div class="grid" id="utilityGrid"></div></div></dialog>
 <input id="importFile" type="file" accept="application/json,.json" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 const starterLinks = [
+  {id:'winstep',name:'Winstep 桌面美化',url:'https://winstep.apsgo.cn/zh-tw',category:'置顶',region:'Windows · 桌面增强工具',desc:'你提供的 APSGO 下载介绍页，包含 Winstep 桌面增强套件、Dock、工具栏与主题功能，并提供开发商官网入口。',access:'正常',tags:['桌面美化','Windows','Dock','实用网站']},
   {id:'steam-official',name:'Steam 官方下载',url:'https://store.steampowered.com/about/?l=schinese',category:'置顶',region:'Valve · Steam 官方网站',desc:'Steam 官方客户端下载安装页面。进入官网后选择适合电脑系统的安装程序；手机请使用官方移动应用入口。网络访问情况因地区和运营商而异。',access:'正常',tags:['Steam','官网下载','游戏','客户端','置顶']},
   {"id":"core77","name":"Core77","url":"https://www.core77.com/","category":"产品设计","region":"国际 · 工业设计资讯","desc":"工业设计资讯与设计师社区，适合研究产品案例、设计过程及行业话题。","access":"正常","tags":["工业设计","产品设计","设计过程"]},
   {"id":"yanko-design","name":"Yanko Design","url":"https://www.yankodesign.com/","category":"产品设计","region":"国际 · 产品概念与资讯","desc":"覆盖消费电子、家具和生活用品等产品设计，适合参考造型、功能与概念表达；概念作品不等同于量产方案。","access":"正常","tags":["产品设计","造型","家具","消费电子"]},
@@ -348,6 +355,7 @@ document.getElementById('refreshBtn').addEventListener('click', () => window.loc
 const COLLECTED_IDS = new Set(['core77','yanko-design','red-dot','archdaily','gooood','landezine','segd','pentagram','brand-new','zcool','nngroup','ixdf']);
 const PROVIDED_IDS = new Set(['everyday-practice','odd-hyphen','sulki-min','pinterest','sakaria','toiletpaper','ndc','design-everywhere','fonts-in-use','its-nice-that']);
 function sourceLabel(item) { if(COLLECTED_IDS.has(item.id))return '<span class="source-badge collected">🔎 chatgpt搜索</span>';return '<span class="source-badge provided">👤 站长收录</span>'; }
+const UTILITY_IDS = new Set(['steam-official','winstep']);
 const STORAGE_LINKS = 'linkshelf_custom_v1';
 const STORAGE_FAVS = 'linkshelf_favorites_v1';
 let customLinks = normalizeLinks(readStorage(STORAGE_LINKS, []));
@@ -407,15 +415,19 @@ function render() {
   let items = all.filter(item => {
     const categoryMatches = currentCategory === '全部' || (currentCategory === '我的收藏' ? favorites.has(item.id) : item.category === currentCategory || (currentCategory === '作品集' && item.category === '作品集'));
     const blob = [item.name,item.url,item.category,item.region,item.desc,...(item.tags||[])].join(' ').toLocaleLowerCase();
-    return categoryMatches && query.split(/\s+/).every(word=>blob.includes(word));
+    return !UTILITY_IDS.has(item.id) && categoryMatches && query.split(/\s+/).every(word=>blob.includes(word));
   });
   const sort=document.getElementById('sortSelect').value;
   if(sort==='name')items.sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
   if(sort==='favorites')items.sort((a,b)=>Number(favorites.has(b.id))-Number(favorites.has(a.id)));
   document.getElementById('categoryCount').textContent=new Set(all.map(x=>x.category)).size;
-  document.getElementById('linkGrid').innerHTML = items.map(cardMarkup).join('');
-  document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
-  document.getElementById('resultCount').textContent = `显示 ${items.length} 个网站 · ${translationEnabled ? '点击名称打开中文翻译版 · 可用“原站”直接访问' : '点击名称直接访问 · 可用“中文翻译”查看中文版本'}`;
+  const utilityItems=all.filter(item=>UTILITY_IDS.has(item.id));
+  const showUtility=(currentCategory==='全部'||currentCategory==='置顶'||(currentCategory==='我的收藏'&&utilityItems.some(x=>favorites.has(x.id)))) && query.split(/\s+/).every(word=>['实用网站','合集','置顶',...utilityItems.map(x=>[x.name,x.desc,...x.tags].join(' '))].join(' ').toLocaleLowerCase().includes(word));
+  const utilityCard=showUtility?'<article class="card utility-cover"><div class="card-top"><span class="category-label">📌 置顶合集</span><span class="source-badge provided">👤 站长收录</span></div><h3>实用网站</h3><p class="desc">电脑软件与桌面工具 · 2 个链接</p><button type="button" class="action-btn primary" id="openUtility">打开合集 ↗</button></article>':'';
+  document.getElementById('linkGrid').innerHTML = utilityCard + items.map(cardMarkup).join('');
+  document.getElementById('utilityGrid').innerHTML=utilityItems.map(cardMarkup).join('');
+  document.getElementById('emptyState').style.display = (items.length || showUtility) ? 'none' : 'block';
+  document.getElementById('resultCount').textContent = `显示 ${items.length} 个网站${showUtility ? ' + 1 个置顶合集' : ''} · ${translationEnabled ? '点击名称打开中文翻译版 · 可用“原站”直接访问' : '点击名称直接访问 · 可用“中文翻译”查看中文版本'}`;
   document.getElementById('listTitle').textContent = currentCategory === '全部' ? '精选设计网站' : currentCategory === '我的收藏' ? '收藏' : currentCategory;
   document.getElementById('totalCount').textContent = all.length;
   document.getElementById('favoriteCount').textContent = favorites.size;
@@ -438,7 +450,7 @@ function renderSuggestions() {
   const q = searchInput.value.trim().toLocaleLowerCase();
   if (!q) { searchSuggestions.classList.remove('show'); searchInput.setAttribute('aria-expanded','false'); searchSuggestions.innerHTML=''; return; }
   activeSuggestion=-1;
-  const matches = allLinks().filter(item => (currentCategory==='全部'||(currentCategory==='我的收藏'?favorites.has(item.id):item.category===currentCategory)) && [item.name,item.url,item.category,item.region,item.desc,...(item.tags||[])].join(' ').toLocaleLowerCase().split(' ').join(' ').includes(q)).slice(0,8);
+  const matches = allLinks().filter(item => !UTILITY_IDS.has(item.id) && (currentCategory==='全部'||(currentCategory==='我的收藏'?favorites.has(item.id):item.category===currentCategory)) && [item.name,item.url,item.category,item.region,item.desc,...(item.tags||[])].join(' ').toLocaleLowerCase().split(' ').join(' ').includes(q)).slice(0,8);
   searchSuggestions.innerHTML = matches.length ? matches.map(item => `<button type="button" class="suggestion" role="option" data-open-url="${escapeHtml(destinationUrl(item.url))}"><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.region || item.url)} · ${escapeHtml(item.url)}</small></span><span class="arrow">↗</span></button>`).join('') : '<div style="padding:14px;color:#aaaab2;font-size:13px">没有匹配的网站，试试“字体”“日本”“品牌”或“韩国”。</div>';
   searchSuggestions.classList.add('show'); searchInput.setAttribute('aria-expanded','true');
 }
@@ -494,6 +506,8 @@ document.getElementById('importFile').addEventListener('change', async event => 
 });
 function showToast(message) { const el=document.getElementById('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); }
 document.getElementById('translateToggle').addEventListener('click',()=>{translationEnabled=!translationEnabled;try{localStorage.setItem('linkshelf_translate_v1',JSON.stringify(translationEnabled));}catch{showToast('翻译设置无法保存，当前页面仍可使用');}render();if(searchInput.value.trim())renderSuggestions();showToast(translationEnabled?'已开启：网站名称将打开简体中文翻译版':'已关闭：网站名称将直接打开原站');});
+document.getElementById('linkGrid').addEventListener('click',event=>{if(event.target.closest('#openUtility'))document.getElementById('utilityDialog').showModal();});
+document.getElementById('closeUtility').addEventListener('click',()=>document.getElementById('utilityDialog').close());
 document.getElementById('sortSelect').addEventListener('change',render);
 document.getElementById('linkGrid').addEventListener('click',event=>{
   const edit=event.target.closest('[data-edit]'), remove=event.target.closest('[data-delete]');

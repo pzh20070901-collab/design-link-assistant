@@ -12,6 +12,11 @@ const http=require('node:http');
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:'+server.address().port);
  assert.equal(await page.locator('.card').count(),33);
+ assert.equal(await page.locator('.translate-link').count(),33);
+ const translated=await page.locator('.card h3 a').evaluateAll(a=>a.every(x=>{const u=new URL(x.href);return u.hostname==='translate.google.com'&&u.searchParams.get('tl')==='zh-CN'&&Boolean(u.searchParams.get('u'))}));assert.ok(translated);
+ await page.locator('#translateToggle').click();assert.equal(await page.locator('.card h3 a').first().getAttribute('href'),'https://www.core77.com/');
+ await page.reload();assert.equal(await page.locator('#translateToggle').getAttribute('aria-pressed'),'false');
+ await page.locator('#translateToggle').click();await page.locator('#searchInput').fill('Core77');assert.ok((await page.locator('[data-open-url]').first().getAttribute('data-open-url')).includes('translate.google.com'));await page.locator('#searchInput').fill('');
  await page.locator('#searchInput').fill('日本 字体');assert.equal(await page.locator('.card').count(),1);
  await page.locator('#searchInput').fill('');
  for(const [category,count] of Object.entries({'产品设计':3,'环境设计':4,'视觉传达':3,'交互设计':2})){await page.locator('[data-category='+category+']').click();assert.equal(await page.locator('.card').count(),count);} 
